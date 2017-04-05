@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'three_scale_api/resources/default'
+
 module ThreeScaleApi
   module Resources
-    # Proxy resource manager wrapper for proxy entity received by REST API
+    # Proxy resource manager wrapper for the proxy entity received by the REST API
     class ProxyManager < DefaultManager
       attr_accessor :service
-
       # Creates instance of the Proxy resource manager
       #
       # @param [ThreeScaleQE::TestClient] http_client Instance of http client
@@ -14,13 +16,19 @@ module ThreeScaleApi
         @resource_instance = Proxy
       end
 
+      # Base path for the REST call
+      #
+      # @return [String] Base URL for the REST call
       def base_path
         super.concat("/services/#{@service['id']}/proxy")
       end
 
+      # Reads proxy
+      #
+      # @return [Proxy] Proxy resource
       def read
         @log.debug('Read')
-        response = http_client.get("#{base_path}")
+        response = http_client.get(base_path)
         resource_instance(response)
       end
 
@@ -32,7 +40,7 @@ module ThreeScaleApi
       # @return [Proxy] Instance of the proxy resource
       def promote(config_id: 1, from: 'sandbox', to: 'production')
         @log.debug "Promote [#{config_id}] from \"#{from}\" to \"#{to}\""
-        response = @http_client.post("#{base_path}/configs/#{from}/#{config_id}/promote", params: {to: to}, body: {})
+        response = @http_client.post("#{base_path}/configs/#{from}/#{config_id}/promote", params: { to: to }, body: {})
         resource_instance(response)
       end
 
@@ -65,7 +73,6 @@ module ThreeScaleApi
         response = http_client.get("#{base_path}/configs/#{env}/latest")
         resource_instance(response)
       end
-
     end
 
     # Proxy resource wrapper for proxy entity received by REST API

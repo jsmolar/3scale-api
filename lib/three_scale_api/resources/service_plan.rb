@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'three_scale_api/resources/default'
 
 module ThreeScaleApi
   module Resources
-    # Service plan resource manager wrapper for proxy entity received by REST API
+    # Service plan resource manager wrapper for the service plan entity received by the REST API
     class ServicePlanManager < DefaultManager
       attr_accessor :service
 
@@ -15,6 +17,9 @@ module ThreeScaleApi
         @resource_instance = ServicePlan
       end
 
+      # Base path for the REST call
+      #
+      # @return [String] Base URL for the REST call
       def base_path
         super.concat("/services/#{@service['id']}/service_plans")
       end

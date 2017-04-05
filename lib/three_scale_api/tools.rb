@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 require 'logger'
 module ThreeScaleApi
+  # Basic tools module
   module Tools
+    # Basic Logging Factory
     class LoggingFactory
 
       def initialize(log_level: 'debug')
@@ -12,11 +16,9 @@ module ThreeScaleApi
       # @param [String] log_level Logging level as a string
       # @return [Fixnum] Log level id
       def self.get_level(log_level = 'debug')
-        begin
-          Logger.const_get log_level.upcase
-        rescue NameError
-          Logger::DEBUG
-        end
+        Logger.const_get log_level.upcase
+      rescue NameError
+        Logger::DEBUG
       end
 
       # @api public

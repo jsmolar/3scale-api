@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'three_scale_api/tools'
 require 'three_scale_api/resources/default'
 require 'three_scale_api/resources/proxy'
@@ -8,10 +10,8 @@ require 'three_scale_api/resources/application_plan'
 
 module ThreeScaleApi
   module Resources
-    # Default resource manager wrapper for default entity received by REST API
-    # All other managers inherits from Default manager
+    # Service resource manager wrapper for the service entity received by the REST API
     class ServiceManager < DefaultManager
-
       # Creates instance of the Service resource manager
       #
       # @param [ThreeScaleQE::TestClient] http_client Instance of http client
@@ -20,15 +20,16 @@ module ThreeScaleApi
         @resource_instance = Service
       end
 
+      # Base path for the REST call
+      #
+      # @return [String] Base URL for the REST call
       def base_path
         super.concat('/services')
       end
     end
 
-    # Default resource wrapper for any entity received by REST API
-    # All other resources inherits from Default resource
+    # Service resource wrapper for the service entity received by REST API
     class Service < DefaultResource
-
       # Creates instance of the Service resource
       #
       # @param [ThreeScaleQE::TestClient] client Instance of the test client

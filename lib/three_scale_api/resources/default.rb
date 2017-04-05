@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'three_scale_api/tools'
+
 module ThreeScaleApi
   module Resources
     # Default resource manager wrapper for default entity received by REST API
@@ -17,6 +20,9 @@ module ThreeScaleApi
         @collection_name = collection_name
       end
 
+      # Base path for the REST call
+      #
+      # @return [String] Base URL for the REST call
       def base_path
         '/admin/api'
       end
@@ -118,7 +124,7 @@ module ThreeScaleApi
         response = @http_client.get(base_path, params: params)
         return nil unless response
         resources = resource_list(response)
-        resources.find &block
+        resources.find(&block)
       end
 
       # Selects resources by it's spec. conditions
@@ -130,7 +136,7 @@ module ThreeScaleApi
         response = @http_client.get(base_path, params: params)
         return nil unless response
         resources = resource_list(response)
-        resources.select &block
+        resources.select(&block)
       end
 
       # Creates new resource
@@ -154,7 +160,6 @@ module ThreeScaleApi
         resource_instance(response)
       end
 
-
       # Wrapper to create instance of the Resource
       # Requires to have @resource_instance initialized to correct Resource subtype
       #
@@ -166,8 +171,6 @@ module ThreeScaleApi
         @log.debug("[RES] #{inst.class.name.split('::').last}: #{entity}")
         inst
       end
-
-
 
       # Wrap result of the call to the instance
       #
@@ -185,14 +188,12 @@ module ThreeScaleApi
         result.map { |res| instance(res) }
       end
 
-
       # Gets manager name for logging purposes
       #
       # @return [String] Manager name
       def manager_name
         self.class.name.split('::').last
       end
-
 
       # Gets resource name for specific manager
       #
@@ -207,7 +208,6 @@ module ThreeScaleApi
     # Default resource wrapper for any entity received by REST API
     # All other resources inherits from Default resource
     class DefaultResource
-
       attr_accessor :http_client,
                     :manager,
                     :api,
@@ -262,10 +262,9 @@ module ThreeScaleApi
       # @return [DefaultEntity] Entity
       def read
         return nil unless entity
-        if @manager.respond_to?(:read)
-          ent = @manager.read(@entity['id'])
-          @entity = ent.entity
-        end
+        return nil unless @manager.respond_to?(:read)
+        ent = @manager.read(@entity['id'])
+        @entity = ent.entity
       end
 
       def to_s

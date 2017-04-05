@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'uri'
 require 'net/http'
 require 'three_scale_api/tools'
 
 module ThreeScaleApi
+  # Http Client
   class HttpClient
     attr_reader :endpoint, :admin_domain, :provider_key, :headers, :format, :http
 
@@ -12,7 +15,7 @@ module ThreeScaleApi
     # @param [String] endpoint 3Scale admin endpoint
     # @param [String] provider_key Provider key
     # @param [String] format Which format
-    # @param [ver] format Which format
+    # @param [Boolean] verify_ssl Verify ssl
     def initialize(endpoint:, provider_key:, format: :json, verify_ssl: true)
       @endpoint = URI(endpoint).freeze
       @admin_domain = @endpoint.host.freeze
@@ -20,12 +23,8 @@ module ThreeScaleApi
       @logger = ThreeScaleApi::Tools::LoggingFactory.new.get_instance(name: 'HttpClient')
       @http = Net::HTTP.new(admin_domain, @endpoint.port)
       @http.use_ssl = @endpoint.is_a?(URI::HTTPS)
-
-
-      unless verify_ssl
-        @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-
+      @http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless verify_ssl
+      @format = format
       @headers = {
           'Accept' => "application/#{format}",
           'Content-Type' => "application/#{format}",
@@ -38,8 +37,6 @@ module ThreeScaleApi
       end
 
       @headers.freeze
-
-      @format = format
     end
 
     def get(path, params: nil)
@@ -70,10 +67,10 @@ module ThreeScaleApi
     # @param [::Net::HTTPResponse] response
     def parse(response)
       case response
-        when Net::HTTPUnprocessableEntity, Net::HTTPSuccess then parser.decode(response.body)
-        when Net::HTTPForbidden then forbidden!(response)
-        when Net::HTTPNotFound then not_found!(response)
-        else "Can't handle #{response.inspect}"
+      when Net::HTTPUnprocessableEntity, Net::HTTPSuccess then parser.decode(response.body)
+      when Net::HTTPForbidden then forbidden!(response)
+      when Net::HTTPNotFound then not_found!(response)
+      else "Can't handle #{response.inspect}"
       end
     end
 
@@ -91,16 +88,16 @@ module ThreeScaleApi
 
     def serialize(body)
       case body
-        when nil then nil
-        when String then body
-        else parser.encode(body)
+      when nil then nil
+      when String then body
+      else parser.encode(body)
       end
     end
 
     def parser
       case @format
-        when :json then JSONParser
-        else "unknown format #{format}"
+      when :json then JSONParser
+      else "unknown format #{format}"
       end
     end
 
@@ -117,13 +114,14 @@ module ThreeScaleApi
       path
     end
 
+    # Json parser module
     module JSONParser
       module_function
 
       def decode(string)
         case string
-          when nil, ' '.freeze, ''.freeze then nil
-          else ::JSON.parse(string)
+        when nil, ' ', '' then nil
+        else ::JSON.parse(string)
         end
       end
 
