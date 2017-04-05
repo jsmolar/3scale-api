@@ -278,6 +278,10 @@ module ThreeScaleApi
       def manager_instance(which)
         which.new(@http_client, self) if which.respond_to?(:new)
       end
+
+      def include?(key)
+        @entity.include?(key)
+      end
     end
   end
 end

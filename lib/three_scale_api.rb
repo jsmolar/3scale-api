@@ -1,6 +1,7 @@
 require 'three_scale_api/http_client'
 require 'three_scale_api/tools'
 require 'three_scale_api/resources/service'
+
 module ThreeScaleApi
   def self.main()
     http = ThreeScaleApi::HttpClient.new(endpoint: 'https://redhatpstanko-admin.3scale.net',
@@ -15,5 +16,3 @@ module ThreeScaleApi
     serv.metrics.list
   end
 end
-
-ThreeScaleApi.main

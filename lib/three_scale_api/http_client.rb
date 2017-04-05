@@ -60,7 +60,7 @@ module ThreeScaleApi
     end
 
     def delete(path, params: nil)
-      @logger.debug("[DELETE] #{path}: #{body}")
+      @logger.debug("[DELETE] #{path}")
       parse @http.delete(format_path_n_query(path, params), headers)
     end
 
@@ -110,7 +110,7 @@ module ThreeScaleApi
     # Helper to create a string representing a path plus a query string
     def format_path_n_query(path, params)
       path = "#{path}.#{@format}"
-      path << "?#{URI.encode_www_form(params)}" unless params.nil?
+      path += "?#{URI.encode_www_form(params)}" unless params.nil?
       path
     end
 
