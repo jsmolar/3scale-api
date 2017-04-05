@@ -11,10 +11,10 @@ module ThreeScaleApi
 
       # Creates instance of the Default resource manager
       #
-      # @param [ThreeScaleQE::TestClient] http_client Instance of http client
+      # @param [ThreeScaleApi::HttpClient] http_client Instance of http client
       def initialize(http_client, entity_name: nil, collection_name: nil)
         @http_client = http_client
-        @log = ThreeScaleApi::Tools.log_factory.get_instance(name: manager_name)
+        @log = http_client.logger_factory.get_instance(name: manager_name)
         @resource_instance = DefaultResource
         @entity_name = entity_name
         @collection_name = collection_name
@@ -112,10 +112,9 @@ module ThreeScaleApi
       # @param [String] name System name
       # @return [DefaultResource] Resource instance
       def read_by_name(name)
-        find { |ent|
-          ent['system_name'] == name if ent['system_name']
-          ent['name'] == name if ent['name']
-        }
+        find do |ent|
+          ent['system_name'] == name || ent['name'] == name || ent['org_name'] == name || ent['friendly_name'] == name || ent['username'] == name
+        end
       end
 
       # Finds resource by it's spec. attribute name

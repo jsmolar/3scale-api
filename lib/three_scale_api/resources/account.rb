@@ -24,21 +24,24 @@ module ThreeScaleApi
       # Creates developer account (Same way as used in Developer portal)
       # Will also create default user with username
       #
-      # @param [String] name Name of the account
-      # @param [String] username username for developer
       # @param [Hash] attributes Attributes
       # @param [Hash] rest
       # @option attributes [String] :email User Email
+      # @option attributes [String] :org_name Account name
+      # @option attributes [String] :username User name
       # @option attributes [String] :password User Password
       # @option attributes [String] :account_plan_id Account Plan ID
       # @option attributes [String] :service_plan_id Service Plan ID
       # @option attributes [String] :application_plan_id Application Plan ID
-      def sign_up(name, username, attributes: {}, **rest)
-        @log.debug("Sign UP: (#{name}): #{attributes}")
-        body = { org_name: name,
-                 username: username }.merge(attributes).merge(rest)
-        response = http_client.post('/admin/api/signup', body: body)
+      def sign_up(attributes)
+        @log.debug("Sign UP: #{attributes}")
+        response = http_client.post('/admin/api/signup', body: attributes)
         resource_instance(response)
+      end
+
+      # Creates developer
+      def create(attributes)
+        sign_up(attributes)
       end
 
       # Sets account to spec. state

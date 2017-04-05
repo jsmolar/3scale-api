@@ -8,7 +8,14 @@ require 'three_scale_api/tools'
 module ThreeScaleApi
   # Http Client
   class HttpClient
-    attr_reader :endpoint, :admin_domain, :provider_key, :headers, :format, :http
+    attr_reader :endpoint,
+                :admin_domain,
+                :provider_key,
+                :headers,
+                :format,
+                :http,
+                :logger,
+                :logger_factory
 
     # Initializes HttpClient
     #
@@ -16,11 +23,16 @@ module ThreeScaleApi
     # @param [String] provider_key Provider key
     # @param [String] format Which format
     # @param [Boolean] verify_ssl Verify ssl
-    def initialize(endpoint:, provider_key:, format: :json, verify_ssl: true)
+    def initialize(endpoint:,
+                   provider_key:,
+                   format: :json,
+                   verify_ssl: true,
+                   log_level: 'debug')
       @endpoint = URI(endpoint).freeze
       @admin_domain = @endpoint.host.freeze
       @provider_key = provider_key.freeze
-      @logger = ThreeScaleApi::Tools::LoggingFactory.new.get_instance(name: 'HttpClient')
+      @logger_factory = ThreeScaleApi::Tools::LoggingFactory.new(log_level: log_level)
+      @logger = @logger_factory.get_instance(name: 'HttpClient')
       @http = Net::HTTP.new(admin_domain, @endpoint.port)
       @http.use_ssl = @endpoint.is_a?(URI::HTTPS)
       @http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless verify_ssl

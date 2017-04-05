@@ -27,7 +27,7 @@ module ThreeScaleApi
       #
       # @return [Proxy] Proxy resource
       def read
-        @log.debug('Read')
+        @log.debug('Read proxy')
         response = http_client.get(base_path)
         resource_instance(response)
       end

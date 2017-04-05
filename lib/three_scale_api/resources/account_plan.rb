@@ -11,7 +11,7 @@ module ThreeScaleApi
       # @param [ThreeScaleQE::TestClient] http_client Instance of http client
       def initialize(http_client)
         super(http_client, entity_name: 'account_plan', collection_name: 'plans')
-        @resource_instance = Account
+        @resource_instance = AccountPlan
       end
 
       # Base path for the REST call
@@ -43,7 +43,7 @@ module ThreeScaleApi
     end
 
     # Account resource wrapper for account entity received by REST API
-    class Account < DefaultResource
+    class AccountPlan < DefaultResource
       # Creates instance of the Account resource
       #
       # @param [ThreeScaleQE::TestClient] client Instance of the test client

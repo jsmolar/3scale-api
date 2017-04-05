@@ -11,7 +11,7 @@ module ThreeScaleApi
       # Creates instance of the WebHook resource manager
       #
       # @param [ThreeScaleQE::TestClient] http_client Instance of http client
-      def initialize(http_client, service)
+      def initialize(http_client)
         super(http_client, entity_name: 'webhook', collection_name: 'webhooks')
         @resource_instance = WebHook
       end
@@ -48,7 +48,18 @@ module ThreeScaleApi
       # @option attributes [Boolean] application_key_updated_on
       # @return [Hash] Webhook
       def update(attributes)
-        super(attributes)
+        @log.debug("Update #{resource_name}: #{attributes}")
+        response = http_client.patch(base_path, body: attributes)
+        resource_instance(response)
+      end
+
+      # Reads webhooks
+      #
+      # return [WebHook]
+      def read
+        @log.debug('Read webhook')
+        response = http_client.patch(base_path, body: {})
+        resource_instance(response)
       end
 
     end

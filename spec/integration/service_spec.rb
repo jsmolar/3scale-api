@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require 'securerandom'
-require 'three_scale_api/resources/service'
-require 'three_scale_api/http_client'
+require 'three_scale_api'
 require_relative '../spec_helper'
 
 RSpec.describe 'Service Resource', type: :integration do
