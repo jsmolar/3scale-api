@@ -71,7 +71,7 @@ module ThreeScaleApi
       #
       # @return [ApplicationPlansManager] Instance of the app. plans manager
       def application_plans
-        # manager_instance(ApplicationPlanManager)
+        manager_instance(ApplicationPlanManager)
       end
     end
   end

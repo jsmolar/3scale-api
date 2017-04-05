@@ -24,7 +24,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super + ("/application_plans/#{application_plan['id']}/metrics/#{metric['id']}/limits")
+        super + "/application_plans/#{application_plan['id']}/metrics/#{metric['id']}/limits"
       end
 
       # Binds metric to Application plan limit

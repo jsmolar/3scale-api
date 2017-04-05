@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'securerandom'
-require 'three_scale_api/resources/active_doc'
+require 'three_scale_api/resources/account_plan'
 require 'three_scale_api/http_client'
 require_relative '../spec_helper'
 
-RSpec.describe 'Active Doc Resource', type: :integration do
+RSpec.describe 'Account plan Resource', type: :integration do
 
   before(:all) do
     @endpoint = ENV.fetch('ENDPOINT')
@@ -13,9 +13,8 @@ RSpec.describe 'Active Doc Resource', type: :integration do
     @name = SecureRandom.uuid
     @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @manager = ThreeScaleApi::Resources::ActiveDocManager.new(@http_client)
-    @body = '{}'
-    @resource = @manager.create(name: @name, body: @body, published: false, skip_swagger_validations: true)
+    @manager = ThreeScaleApi::Resources::AccountPlanManager.new(@http_client)
+    @resource = @manager.create(name: @name)
   end
 
   after(:all) do
@@ -26,12 +25,13 @@ RSpec.describe 'Active Doc Resource', type: :integration do
     end
   end
 
-  context '#Active doc CRUD' do
+  context '#account_plan CRUD' do
     subject(:entity) { @resource.entity }
+
     it 'create' do
       expect(entity).to include('name' => @name)
-      expect(entity).to include('published' => false)
     end
+
 
     it 'list' do
       res_name = @resource['name']
@@ -44,10 +44,10 @@ RSpec.describe 'Active Doc Resource', type: :integration do
 
     it 'delete' do
       res_name = SecureRandom.uuid
-      res = @manager.create(name: res_name, body: @body, skip_swagger_validations: true )
-      expect(res.entity).to include('name' => res_name)
-      res.delete
-      expect(@manager.list.any? { |s| s['name'] == res['name'] }).to be(false)
+      resource = @manager.create(name: res_name)
+      expect(resource.entity).to include('name' => res_name)
+      resource.delete
+      expect(@manager.list.any? { |r| r['name'] == res_name }).to be(false)
     end
 
     it 'finds' do
@@ -58,9 +58,27 @@ RSpec.describe 'Active Doc Resource', type: :integration do
     end
 
     it 'update' do
-      @resource['published'] = true
-      expect(@resource.update.entity).to include('published' => true)
-      expect(@resource.entity).to include('published' => true)
+      res_name = SecureRandom.uuid
+      @resource['name'] = res_name
+      expect(@resource.update.entity).to include('name' => res_name)
+      expect(@resource.entity).to include('name' => res_name)
     end
+
+    it 'set_default and get_default' do
+      old_default = @manager.get_default
+      if old_default
+        expect(@manager[old_default['id']].entity).to include('default' => true)
+      end
+
+      @resource.set_default
+
+      expect(@manager[@resource['id']].entity).to include('default' => true)
+      if old_default
+        old_default.set_default
+        expect(@manager[old_default['id']].entity).to include('default' => true)
+      end
+    end
+
   end
+
 end

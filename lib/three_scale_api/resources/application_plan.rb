@@ -32,7 +32,7 @@ module ThreeScaleApi
       def list_all
         @log.debug('List all')
         response = @http_client.get('/admin/api/application_plans')
-        resource_instance(response)
+        resource_list(response)
       end
 
       # Sets global default plan
@@ -81,7 +81,7 @@ module ThreeScaleApi
       #
       # @return [ApplicationPlanLimitManager] Application plan limit manager
       # @param [Metric] metric Metric resource
-      def limits(metric:nil)
+      def limits(metric = nil)
         ApplicationPlanLimitManager.new(http_client, self, metric: metric)
       end
     end

@@ -111,6 +111,28 @@ module ThreeScaleApi
       def keys
         manager_instance(ApplicationKeysManager)
       end
+
+      # Sets state of the application
+      #
+      # @param [String] state Application state: 'accept' or 'suspend' or 'resume'
+      def set_state(state)
+        @manager.set_state(@entity['id'], state) if @manager.respond_to?(:set_state)
+      end
+
+      # Accept application
+      def accept
+        set_state('accept')
+      end
+
+      # Suspend application
+      def suspend
+        set_state('suspend')
+      end
+
+      # Resume application
+      def resume
+        set_state('resume')
+      end
     end
   end
 end

@@ -30,7 +30,7 @@ module ThreeScaleApi
       def list_all
         @log.debug('List all')
         response = @http_client.get('/admin/api/service_plans')
-        resource_instance(response)
+        resource_list(response)
       end
 
       # Sets global default plan

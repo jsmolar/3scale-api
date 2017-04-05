@@ -14,50 +14,51 @@ RSpec.describe 'Service Resource', type: :integration do
     @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
     @manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @service = @manager.create({name: @name, system_name: @name})
+    @resource = @manager.create(name: @name, system_name: @name)
   end
 
   after(:all) do
     begin
-      @service.delete
-    rescue ThreeScaleApi::HttpClient::NotFoundError
+      @resource.delete
+    rescue ThreeScaleApi::HttpClient::NotFoundError => ex
+      puts ex
     end
   end
 
   context '#service CRUD' do
-    subject(:entity) { @service.entity }
-    it 'creates a service' do
+    subject(:entity) { @resource.entity }
+    it 'create' do
       expect(entity).to include('system_name' => @name)
     end
 
     it 'list' do
-      serv_name = @service['system_name']
-      expect(@manager.list.any? { |serv| serv['system_name'] == serv_name }).to be(true)
+      res_name = @resource['system_name']
+      expect(@manager.list.any? { |res| res['system_name'] == res_name }).to be(true)
     end
 
     it 'read' do
-      expect(@manager.read(@service['id']).entity).to include('system_name' => @service['system_name'])
+      expect(@manager.read(@resource['id']).entity).to include('system_name' => @name)
     end
 
     it 'delete' do
-      s_name = SecureRandom.uuid
-      serv = @manager.create({name: s_name, system_name: s_name})
-      expect(serv.entity).to include('system_name' => s_name)
-      serv.delete
-      expect(@manager.list.any? { |s| s['system_name'] == serv['system_name'] }).to be(false)
+      res_name = SecureRandom.uuid
+      resource = @manager.create({name: res_name, system_name: res_name})
+      expect(resource.entity).to include('system_name' => res_name)
+      resource.delete
+      expect(@manager.list.any? { |r| r['system_name'] == res_name }).to be(false)
     end
 
     it 'finds' do
-      serv = @manager[@service['system_name']]
-      expect(serv.entity).to include('id' => serv['id'])
-      serv_id = @manager[@service['id']]
-      expect(serv_id.entity).to include('system_name' => @name)
+      resource = @manager[@resource['system_name']]
+      expect(resource.entity).to include('id' => @resource['id'])
+      resource_id = @manager[@resource['id']]
+      expect(resource_id.entity).to include('system_name' => @name)
     end
 
     it 'update' do
-      @service['name'] = 'testServiceNameUpdated'
-      expect(@service.update.entity).to include('name' => 'testServiceNameUpdated')
-      expect(@service.entity).to include('name' => 'testServiceNameUpdated')
+      @resource['name'] = 'testServiceNameUpdated'
+      expect(@resource.update.entity).to include('name' => 'testServiceNameUpdated')
+      expect(@resource.entity).to include('name' => 'testServiceNameUpdated')
     end
   end
 

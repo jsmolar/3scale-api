@@ -24,7 +24,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        '/admin/api'
+        +'/admin/api'
       end
 
       # Extracts Hash from response
@@ -112,7 +112,10 @@ module ThreeScaleApi
       # @param [String] name System name
       # @return [DefaultResource] Resource instance
       def read_by_name(name)
-        find { |ent| ent['system_name'] == name }
+        find { |ent|
+          ent['system_name'] == name if ent['system_name']
+          ent['name'] == name if ent['name']
+        }
       end
 
       # Finds resource by it's spec. attribute name
@@ -199,7 +202,7 @@ module ThreeScaleApi
       #
       # @return [String] Manager name
       def resource_name
-        manager = manager_name
+        manager = manager_name.dup
         manager['Manager'] = ''
         manager
       end
@@ -282,6 +285,11 @@ module ThreeScaleApi
       def include?(key)
         @entity.include?(key)
       end
+
+      def to_h
+        @entity
+      end
+
     end
   end
 end

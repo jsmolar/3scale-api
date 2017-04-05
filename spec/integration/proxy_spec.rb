@@ -14,16 +14,17 @@ RSpec.describe 'Proxy API', type: :integration do
     @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
     @manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @service = @manager.create({name: @name, system_name: @name})
+    @service = @manager.create(name: @name, system_name: @name)
     @proxy = @service.proxy.read
     @entity = @proxy.entity
-    @url = "http://#{ @name }.com:7777"
+    @url = "http://#{@name}.com:7777"
   end
 
   after(:all) do
     begin
       @service.delete
-    rescue ThreeScaleApi::HttpClient::NotFoundError
+    rescue ThreeScaleApi::HttpClient::NotFoundError => ex
+      puts ex
     end
   end
 

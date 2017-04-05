@@ -13,47 +13,57 @@ RSpec.describe 'Metric Resource', type: :integration do
     @name = SecureRandom.uuid
     @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @serv_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @service = @serv_manager.create({name: @name, system_name: @name})
-    @unit = 'click'
+    @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
+    @service = @s_manager.create(name: @name, system_name: @name)
     @manager = @service.metrics
-    @metric = @manager.create({friendly_name: @name, unit: @unit})
+    @unit = 'click'
+    @resource = @manager.create(friendly_name: @name, unit: @unit)
   end
 
   after(:all) do
     begin
+      @resource.delete
       @service.delete
-    rescue ThreeScaleApi::HttpClient::NotFoundError
+    rescue ThreeScaleApi::HttpClient::NotFoundError => ex
+      puts ex
     end
   end
 
-  context '#metric CRUD' do
-    subject(:entity) { @metric.entity }
+  context '#metrics CRUD' do
+    subject(:entity) { @resource.entity }
     it 'create' do
       expect(entity).to include('friendly_name' => @name)
     end
 
     it 'list' do
-      name = @metric['friendly_name']
-      expect(@manager.list.any? { |met| met['friendly_name'] == name }).to be(true)
+      res_name = @resource['friendly_name']
+      expect(@manager.list.any? { |res| res['friendly_name'] == res_name }).to be(true)
     end
 
     it 'read' do
-      expect(@manager.read(@metric['id']).entity).to include('friendly_name' => @name)
+      expect(@manager.read(@resource['id']).entity).to include('friendly_name' => @name)
     end
 
     it 'delete' do
-      s_name = SecureRandom.uuid
-      metric = @manager.create({friendly_name: s_name, unit: @unit})
-      expect(metric.entity).to include('friendly_name' => s_name)
-      metric.delete
-      expect(@manager.list.any? { |s| s['friendly_name'] == metric['friendly_name'] }).to be(false)
+      res_name = SecureRandom.uuid
+      resource = @manager.create(unit: @unit, friendly_name: res_name)
+      expect(resource.entity).to include('friendly_name' => res_name)
+      resource.delete
+      expect(@manager.list.any? { |r| r['friendly_name'] == res_name }).to be(false)
+    end
+
+    it 'find' do
+      resource = @manager[@resource['system_name']]
+      expect(resource.entity).to include('id' => @resource['id'])
+      resource_id = @manager[@resource['id']]
+      expect(resource_id.entity).to include('friendly_name' => @name)
     end
 
     it 'update' do
-      @metric['unit'] = 'testUnit'
-      expect(@metric.update.entity).to include('unit' => 'testUnit')
-      expect(@metric.entity).to include('unit' => 'testUnit')
+      unit_name = @unit + 'Updated'
+      @resource['unit'] = unit_name
+      expect(@resource.update.entity).to include('unit' => unit_name)
+      expect(@resource.entity).to include('unit' => unit_name)
     end
   end
 

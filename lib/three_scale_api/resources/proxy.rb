@@ -32,6 +32,9 @@ module ThreeScaleApi
         resource_instance(response)
       end
 
+      # Updates proxy
+      #
+      # @return [Proxy] Updated proxy
       def update(attributes)
         @log.debug("Update #{resource_name}: #{attributes}")
         response = http_client.patch(base_path, body: attributes)
