@@ -15,11 +15,16 @@ module ThreeScaleApi
         @resource_instance = ActiveDoc
       end
 
+      def read(id)
+        @log.debug("Read #{resource_name}: #{id}")
+        list.find { |doc| doc['id'] == id }
+      end
+
       # Base path for the REST call
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super.concat('/active_docs')
+        super + '/active_docs'
       end
     end
 

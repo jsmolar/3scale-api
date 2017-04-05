@@ -23,7 +23,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super.concat("/services/#{@service['id']}/metrics")
+        super + ("/services/#{@service['id']}/metrics")
       end
     end
 

@@ -18,7 +18,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super.concat('/account_plans')
+        super + '/account_plans'
       end
 
       # Sets global default plan

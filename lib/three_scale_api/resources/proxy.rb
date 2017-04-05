@@ -20,7 +20,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super.concat("/services/#{@service['id']}/proxy")
+        super + ("/services/#{@service['id']}/proxy")
       end
 
       # Reads proxy
@@ -29,6 +29,12 @@ module ThreeScaleApi
       def read
         @log.debug('Read')
         response = http_client.get(base_path)
+        resource_instance(response)
+      end
+
+      def update(attributes)
+        @log.debug("Update #{resource_name}: #{attributes}")
+        response = http_client.patch(base_path, body: attributes)
         resource_instance(response)
       end
 
@@ -87,6 +93,10 @@ module ThreeScaleApi
       def initialize(client, manager, entity)
         super(client, manager, entity)
         @service = manager.service
+      end
+
+      def update
+        @manager.update(entity)
       end
     end
   end
