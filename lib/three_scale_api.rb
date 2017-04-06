@@ -13,6 +13,7 @@ require 'three_scale_api/resources/settings'
 module ThreeScaleApi
   # Base class that is supposed to be used for communication with the REST API
   class Client
+    attr_accessor :http_client
     # Initializes base client instance for manipulation with the REST API and resources
     #
     # @param [String] endpoint 3Scale admin pages url

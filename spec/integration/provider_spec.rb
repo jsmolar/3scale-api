@@ -1,71 +1,58 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'three_scale_api/resources/provider'
-require 'three_scale_api/http_client'
-require_relative '../spec_helper'
+require_relative '../shared_stuff'
 
 RSpec.describe 'Provider Resource', type: :integration do
 
+  include_context 'Shared initialization'
+
   before(:all) do
-    @endpoint = ENV.fetch('ENDPOINT')
-    @provider_key = ENV.fetch('PROVIDER_KEY')
-    @name = SecureRandom.uuid
-    @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @manager = ThreeScaleApi::Resources::ProviderManager.new(@http_client)
-    @resource = @manager.create(username: @name,
-                                email: "#{@name}@example.com",
-                                password: @name)
+    @manager = @client.providers
+    @resource = create_provider
   end
 
   after(:all) do
-    begin
-      @resource.delete
-    rescue ThreeScaleApi::HttpClient::NotFoundError => ex
-      puts ex
-    end
+    clean_resource(@resource)
   end
 
   context '#provider CRUD' do
     subject(:entity) { @resource.entity }
     let(:base_attr) { 'username' }
-    it 'create' do
+    it 'should create provider' do
       expect(entity).to include(base_attr => @name)
     end
 
-    it 'list' do
+    it 'should list provider' do
       res_name = @resource[base_attr]
       expect(@manager.list.any? { |res| res[base_attr] == res_name }).to be(true)
     end
 
-    it 'read' do
+    it 'should read provider' do
       expect(@manager.read(@resource['id']).entity).to include(base_attr => @name)
     end
 
-    it 'delete' do
+    it 'should delete provider' do
       res_name = SecureRandom.uuid
-      resource = @manager.create(username: res_name,
-                                 email: "#{res_name}@example.com",
-                                 password: res_name)
+      resource = create_provider(name: res_name)
       expect(resource.entity).to include(base_attr => res_name)
       resource.delete
       expect(@manager.list.any? { |r| r[base_attr] == res_name }).to be(false)
     end
 
-    it 'update' do
+    it 'should update provider' do
       new_name = SecureRandom.uuid
       @resource[base_attr] = new_name
       expect(@resource.update.entity).to include(base_attr => new_name)
       expect(@resource.entity).to include(base_attr => new_name)
     end
 
-    it 'activates' do
+    it 'should activate provider' do
       expect(@resource['state']).to eq('pending')
       @resource.activate
       expect(@manager[@resource['id']].entity).to include('state' => 'active')
     end
 
-    it 'set_as_admin' do
+    it 'should set provider as admin' do
       expect(@resource['role']).to eq('member')
       @resource.as_admin
       expect(@manager[@resource['id']].entity).to include('role' => 'admin')

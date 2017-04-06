@@ -1,54 +1,44 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'three_scale_api/resources/service'
-require 'three_scale_api/http_client'
-require_relative '../spec_helper'
+require_relative '../shared_stuff'
 
 RSpec.describe 'Service plan Resource', type: :integration do
 
+  include_context 'Shared initialization'
+
   before(:all) do
-    @endpoint = ENV.fetch('ENDPOINT')
-    @provider_key = ENV.fetch('PROVIDER_KEY')
-    @name = SecureRandom.uuid
-    @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @service = @s_manager.create(name: @name)
+    @service = create_service
     @manager =  @service.service_plans
     @resource = @manager.create(name: @name, system_name: @name)
   end
 
   after(:all) do
-    begin
-      @resource.delete
-      @service.delete
-    rescue ThreeScaleApi::HttpClient::NotFoundError => ex
-      puts ex
-    end
+   clean_resource(@service)
   end
 
   context '#service_plan CRUD' do
     subject(:entity) { @resource.entity }
     let(:base_attr) { 'name' }
-    it 'create' do
+
+    it 'should create service' do
       expect(entity).to include(base_attr => @name)
     end
 
-    it 'list' do
+    it 'should list service plan' do
       res_name = @resource[base_attr]
       expect(@manager.list.any? { |res| res[base_attr] == res_name }).to be(true)
     end
 
-    it 'list_all' do
+    it 'should list all service plans' do
       res_name = @resource[base_attr]
       expect(@manager.list_all.any? { |res| res[base_attr] == res_name }).to be(true)
     end
 
-    it 'read' do
+    it 'should read service plan' do
       expect(@manager.read(@resource['id']).entity).to include(base_attr => @name)
     end
 
-    it 'delete' do
+    it 'should delete service plan' do
       res_name = SecureRandom.uuid
       resource = @manager.create(name: res_name)
       expect(resource.entity).to include(base_attr => res_name)
@@ -56,21 +46,21 @@ RSpec.describe 'Service plan Resource', type: :integration do
       expect(@manager.list.any? { |r| r[base_attr] == res_name }).to be(false)
     end
 
-    it 'finds' do
+    it 'should find service plan' do
       resource = @manager[@resource[base_attr]]
       expect(resource.entity).to include('id' => @resource['id'])
       resource_id = @manager[@resource['id']]
       expect(resource_id.entity).to include(base_attr => @name)
     end
 
-    it 'update' do
+    it 'should update service plan' do
       res_name = SecureRandom.uuid
       @resource[base_attr] = res_name
       expect(@resource.update.entity).to include(base_attr => res_name)
       expect(@resource.entity).to include(base_attr => res_name)
     end
 
-    it 'set_default and get_default' do
+    it 'should set_default and get_default service plan' do
       old_default = @manager.get_default
       if old_default
         expect(@manager[old_default['id']].to_h).to include('default' => true)

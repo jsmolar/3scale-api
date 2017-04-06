@@ -112,6 +112,7 @@ module ThreeScaleApi
       # @param [String] name System name
       # @return [DefaultResource] Resource instance
       def read_by_name(name)
+        name = name.to_s
         find do |ent|
           ent['system_name'] == name || ent['name'] == name || ent['org_name'] == name || ent['friendly_name'] == name || ent['username'] == name
         end

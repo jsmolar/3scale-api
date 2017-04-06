@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
-require 'three_scale_api'
-require_relative '../spec_helper'
+require_relative '../shared_stuff'
 
 RSpec.describe 'Settings Resource', type: :integration do
 
+  include_context 'Shared initialization'
+
   before(:all) do
-    @endpoint = ENV.fetch('ENDPOINT')
-    @provider_key = ENV.fetch('PROVIDER_KEY')
-    @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @manager = ThreeScaleApi::Resources::SettingsManager.new(@http_client)
+    @manager = @client.settings
   end
 
   context '#settings read and update' do

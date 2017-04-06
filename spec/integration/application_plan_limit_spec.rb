@@ -1,60 +1,49 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'three_scale_api/resources/service'
-require 'three_scale_api/http_client'
-require_relative '../spec_helper'
+require_relative '../shared_stuff'
 
 RSpec.describe 'Application plan limit resource', type: :integration do
 
+  include_context 'Shared initialization'
+
   before(:all) do
-    @endpoint = ENV.fetch('ENDPOINT')
-    @provider_key = ENV.fetch('PROVIDER_KEY')
-    @name = SecureRandom.uuid
-    @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @service = @s_manager.create(name: @name)
+    @service = create_service
     @unit = 'click'
     @metric = @service.metrics.create(friendly_name: @name, unit: @unit)
-    @ap_manager = @service.application_plans
-    @app_plan = @ap_manager.create(name: @name, system_name: @name)
+    @app_plan = @service.application_plans.create(name: @name, system_name: @name)
     @manager = @app_plan.limits(@metric)
     @resource = @manager.create(period: 'minute', value: 10)
   end
 
   after(:all) do
-    begin
-      @resource.delete
-      @app_plan.delete
-      @service.delete
-    rescue ThreeScaleApi::HttpClient::NotFoundError => ex
-      puts ex
-    end
+    clean_resource(@app_plan)
+    clean_resource(@metric)
+    clean_resource(@service)
   end
 
   context '#application_limit_plan CRUD' do
     subject(:entity) { @resource.entity }
-    it 'create' do
+    it 'should create application plan limit' do
       expect(entity).to include('period' => 'minute')
       expect(entity).to include('value' => 10)
     end
 
-    it 'list' do
+    it 'should list application plan limits' do
       expect(@manager.list.length).to be >= 1
     end
 
-    it 'read' do
+    it 'should read application plan limit' do
       expect(@manager.read(@resource['id']).entity).to include('period' => 'minute')
     end
 
-    it 'delete' do
+    it 'should delete application plan limit' do
       resource = @manager.create(period: 'hour', value: 100)
       expect(resource.entity).to include('period' => 'hour')
       resource.delete
       expect(@manager.list.any? { |r| r['period'] == 'hour' }).to be(false)
     end
 
-    it 'update' do
+    it 'should update application plan limit' do
       @resource['value'] = 100
       expect(@resource.update.entity).to include('value' => 100)
       expect(@resource.entity).to include('value' => 100)

@@ -14,7 +14,7 @@ module ThreeScaleApi
                 :headers,
                 :format,
                 :http,
-                :logger,
+                :log,
                 :logger_factory
 
     # Initializes HttpClient
@@ -32,7 +32,7 @@ module ThreeScaleApi
       @admin_domain = @endpoint.host.freeze
       @provider_key = provider_key.freeze
       @logger_factory = ThreeScaleApi::Tools::LoggingFactory.new(log_level: log_level)
-      @logger = @logger_factory.get_instance(name: 'HttpClient')
+      @log = @logger_factory.get_instance(name: 'HttpClient')
       @http = Net::HTTP.new(admin_domain, @endpoint.port)
       @http.use_ssl = @endpoint.is_a?(URI::HTTPS)
       @http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless verify_ssl
@@ -52,27 +52,27 @@ module ThreeScaleApi
     end
 
     def get(path, params: nil)
-      @logger.debug("[GET] #{path}")
+      @log.debug("[GET] #{path}")
       parse @http.get(format_path_n_query(path, params), headers)
     end
 
     def patch(path, body:, params: nil)
-      @logger.debug("[PATCH] #{path}: #{body}")
+      @log.debug("[PATCH] #{path}: #{body}")
       parse @http.patch(format_path_n_query(path, params), serialize(body), headers)
     end
 
     def post(path, body:, params: nil)
-      @logger.debug("[POST] #{path}: #{body}")
+      @log.debug("[POST] #{path}: #{body}")
       parse @http.post(format_path_n_query(path, params), serialize(body), headers)
     end
 
     def put(path, body: nil, params: nil)
-      @logger.debug("[PUT] #{path}: #{body}")
+      @log.debug("[PUT] #{path}: #{body}")
       parse @http.put(format_path_n_query(path, params), serialize(body), headers)
     end
 
     def delete(path, params: nil)
-      @logger.debug("[DELETE] #{path}")
+      @log.debug("[DELETE] #{path}")
       parse @http.delete(format_path_n_query(path, params), headers)
     end
 
