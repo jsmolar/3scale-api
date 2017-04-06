@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'three_scale_api/resources/default'
+require 'three_scale_api/resources/account_user'
+require 'three_scale_api/resources/application'
 
 module ThreeScaleApi
   module Resources
@@ -25,7 +27,6 @@ module ThreeScaleApi
       # Will also create default user with username
       #
       # @param [Hash] attributes Attributes
-      # @param [Hash] rest
       # @option attributes [String] :email User Email
       # @option attributes [String] :org_name Account name
       # @option attributes [String] :username User name
@@ -48,7 +49,7 @@ module ThreeScaleApi
       #
       # @param [Fixnum] id Account ID
       # @param [String] state 'approve' or 'reject' or 'make_pending'
-      def set_state(id, state: 'approve')
+      def set_state(id, state = 'approve')
         @log.debug "Set state [#{id}]: #{state}"
         response = http_client.put("#{base_path}/#{id}/#{state}")
         resource_instance(response)
@@ -105,33 +106,40 @@ module ThreeScaleApi
         @manager.set_plan(@entity['id'], plan_id) if @manager.respond_to?(:set_plan)
       end
 
+      # Sets state of the account
+      #
+      # @param [String] state 'approve' or 'reject' or 'make_pending'
+      def set_state(state)
+        @manager.set_state(@entity['id'], state) if @manager.respond_to?(:set_state)
+      end
+
       # Approves account
       def approve
-        @manager.approve(@entity['id']) if @manager.respond_to?(:approve)
+        set_state('approve')
       end
 
       # Reject account
       def reject
-        @manager.reject(@entity['id']) if @manager.respond_to?(:reject)
+        set_state('reject')
       end
 
       # Set pending for account
       def pending
-        @manager.pending(@entity['id']) if @manager.respond_to?(:pending)
+        set_state('pending')
       end
 
       # Gets Account Users Manager
       #
       # @return [AccountUsersManager] Account Users Manager
       def users
-        # manager_instance(AccountUserManager)
+        manager_instance(AccountUserManager)
       end
 
       # Gets  Application Manager
       #
       # @return [ApplicationManager] Account Users Manager
       def applications
-        # manager_instance(ApplicationManager)
+        manager_instance(ApplicationManager)
       end
     end
   end

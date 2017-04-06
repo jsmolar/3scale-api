@@ -82,7 +82,7 @@ module ThreeScaleApi
       # @return [ApplicationPlanLimitManager] Application plan limit manager
       # @param [Metric] metric Metric resource
       def limits(metric = nil)
-        ApplicationPlanLimitManager.new(http_client, self, metric: metric)
+        manager_instance(ApplicationPlanLimitManager, metric: metric)
       end
     end
   end

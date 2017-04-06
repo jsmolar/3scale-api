@@ -11,7 +11,6 @@ RSpec.describe 'Application plan limit resource', type: :integration do
     @endpoint = ENV.fetch('ENDPOINT')
     @provider_key = ENV.fetch('PROVIDER_KEY')
     @name = SecureRandom.uuid
-    @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
     @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
     @service = @s_manager.create(name: @name)

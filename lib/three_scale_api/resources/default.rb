@@ -276,9 +276,10 @@ module ThreeScaleApi
       # Wrapper to create manager instance
       #
       # @param [Class<DefaultManager>] which Manager which instance will be created
+      # @param [Array<Symbol>] args Optional arguments
       # @return [DefaultManager] Instance of the specific manager
-      def manager_instance(which)
-        which.new(@http_client, self) if which.respond_to?(:new)
+      def manager_instance(which, *args)
+        which.new(@http_client, self, *args) if which.respond_to?(:new)
       end
 
       def include?(key)

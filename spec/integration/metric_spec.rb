@@ -11,7 +11,6 @@ RSpec.describe 'Metric Resource', type: :integration do
     @endpoint = ENV.fetch('ENDPOINT')
     @provider_key = ENV.fetch('PROVIDER_KEY')
     @name = SecureRandom.uuid
-    @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
     @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
     @service = @s_manager.create(name: @name, system_name: @name)
@@ -29,34 +28,40 @@ RSpec.describe 'Metric Resource', type: :integration do
     end
   end
 
-  context '#metrics CRUD' do
+  context '#metric' do
     subject(:entity) { @resource.entity }
+    let(:base_attr) { 'friendly_name' }
+
+    it 'has valid references' do
+      expect(@resource.service).to eq(@service)
+    end
+
     it 'create' do
-      expect(entity).to include('friendly_name' => @name)
+      expect(entity).to include(base_attr => @name)
     end
 
     it 'list' do
-      res_name = @resource['friendly_name']
-      expect(@manager.list.any? { |res| res['friendly_name'] == res_name }).to be(true)
+      res_name = @resource[base_attr]
+      expect(@manager.list.any? { |res| res[base_attr] == res_name }).to be(true)
     end
 
     it 'read' do
-      expect(@manager.read(@resource['id']).entity).to include('friendly_name' => @name)
+      expect(@manager.read(@resource['id']).entity).to include(base_attr => @name)
     end
 
     it 'delete' do
       res_name = SecureRandom.uuid
       resource = @manager.create(unit: @unit, friendly_name: res_name)
-      expect(resource.entity).to include('friendly_name' => res_name)
+      expect(resource.entity).to include(base_attr => res_name)
       resource.delete
-      expect(@manager.list.any? { |r| r['friendly_name'] == res_name }).to be(false)
+      expect(@manager.list.any? { |r| r[base_attr] == res_name }).to be(false)
     end
 
     it 'find' do
       resource = @manager[@resource['system_name']]
       expect(resource.entity).to include('id' => @resource['id'])
       resource_id = @manager[@resource['id']]
-      expect(resource_id.entity).to include('friendly_name' => @name)
+      expect(resource_id.entity).to include(base_attr => @name)
     end
 
     it 'update' do

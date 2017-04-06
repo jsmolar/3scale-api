@@ -38,14 +38,16 @@ module ThreeScaleApi
       # Creates an application
       #
       # @param [Hash] attributes Attributes for the application
-      # @param [Fixnum] plan_id Application plan id
-      # @param [Hash] rest Rest of the parameters
+      # @option attributes [String] :name Application Name
+      # @option attributes [String] :description Application Description
+      # @option attributes [String] :user_key Application User Key
+      # @option attributes [String] :application_id Application App ID
+      # @option attributes [String] :application_key Application App Key(s)
+      # @option attributes [String] :redirect_url OAuth endpoint
+      # @option attributes [Fixnum] :plan_id Application Plan ID
       # @return [Application] Instance of the application
-      def create(attributes, plan_id:, **rest)
-        body = {plan_id: plan_id}.merge(attributes).merge(rest)
-        @log.debug("#{resource_name} Create: #{body}")
-        response = http_client.post(base_path, body: body)
-        resource_instance(response)
+      def create(attributes)
+       super(attributes)
       end
 
       # Finds the application by specified attributes
@@ -65,7 +67,7 @@ module ThreeScaleApi
       #
       # @param [Fixnum] id Application ID
       # @param [String] state Application state: 'accept' or 'suspend' or 'resume'
-      def set_state(id, state: 'accept')
+      def set_state(id, state = 'accept')
         response = http_client.put("#{base_path}/#{id}/#{state}")
         resource_instance(response)
       end
@@ -109,7 +111,7 @@ module ThreeScaleApi
       #
       # @return [ApplicationKeysManager] Application keys manager instance
       def keys
-        manager_instance(ApplicationKeysManager)
+        manager_instance(ApplicationKeyManager)
       end
 
       # Sets state of the application

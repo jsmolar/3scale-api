@@ -1,33 +1,41 @@
 # frozen_string_literal: true
 
 require 'securerandom'
-require 'three_scale_api'
+require 'three_scale_api/resources/service'
+require 'three_scale_api/http_client'
 require_relative '../spec_helper'
 
-RSpec.describe 'Service Resource', type: :integration do
+RSpec.describe 'Mapping rule Resource', type: :integration do
 
   before(:all) do
     @endpoint = ENV.fetch('ENDPOINT')
     @provider_key = ENV.fetch('PROVIDER_KEY')
-    @name = SecureRandom.uuid
+    uuid = SecureRandom.uuid
+    @name = "/#{uuid}"
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @resource = @manager.create(name: @name, system_name: @name)
+    @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
+    @service = @s_manager.create(name: uuid, system_name: uuid)
+    @metric = @service.metrics.list.first
+    @manager = @service.mapping_rules(@metric)
+    @resource = @manager.create(http_method: 'DELETE', pattern: @name, delta: 1)
   end
 
   after(:all) do
     begin
       @resource.delete
+      @service.delete
     rescue ThreeScaleApi::HttpClient::NotFoundError => ex
       puts ex
     end
   end
 
-  context '#service CRUD' do
+  context '#mapping_rule CRUD' do
     subject(:entity) { @resource.entity }
-    let(:base_attr) { 'system_name' }
+    let(:base_attr) { 'pattern' }
 
     it 'has valid references' do
+      expect(@resource.service).to eq(@service)
+      expect(@resource.metric).to eq(@metric)
       expect(@resource.manager).to eq(@manager)
     end
 
@@ -45,25 +53,18 @@ RSpec.describe 'Service Resource', type: :integration do
     end
 
     it 'delete' do
-      res_name = SecureRandom.uuid
-      resource = @manager.create({name: res_name, system_name: res_name})
+      res_name = "/#{SecureRandom.uuid}"
+      resource = @manager.create(http_method: 'PATCH', pattern: res_name, delta: 1)
       expect(resource.entity).to include(base_attr => res_name)
       resource.delete
       expect(@manager.list.any? { |r| r[base_attr] == res_name }).to be(false)
     end
 
-    it 'finds' do
-      resource = @manager[@resource[base_attr]]
-      expect(resource.entity).to include('id' => @resource['id'])
-      resource_id = @manager[@resource['id']]
-      expect(resource_id.entity).to include(base_attr => @name)
-    end
-
     it 'update' do
-      @resource['name'] = 'testServiceNameUpdated'
-      expect(@resource.update.entity).to include('name' => 'testServiceNameUpdated')
-      expect(@resource.entity).to include('name' => 'testServiceNameUpdated')
+      updated = 100
+      @resource['delta'] = updated
+      expect(@resource.update.entity).to include('delta' => updated)
+      expect(@resource.entity).to include('delta' => updated)
     end
   end
-
 end

@@ -63,8 +63,8 @@ module ThreeScaleApi
       # Gets the mapping rules manager that has bind this service resource
       #
       # @return [MappingRulesManager] Instance of the mapping rules manager
-      def mapping_rules
-        # manager_instance(MappingRuleManager)
+      def mapping_rules(metric = nil)
+        manager_instance(MappingRuleManager, metric: metric)
       end
 
       # Gets the application plans manager that has bind this service resource

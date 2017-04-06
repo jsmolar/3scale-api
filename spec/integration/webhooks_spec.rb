@@ -15,7 +15,6 @@ RSpec.describe 'WebHooks Resource', type: :integration do
   context '#WebHooks read and update' do
     subject(:entity) { @manager.read }
 
-
     it 'read' do
       expect(entity).to be_truthy
       expect(entity.entity).to include('account_created_on')

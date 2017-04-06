@@ -1,32 +1,45 @@
 # frozen_string_literal: true
 
 require 'securerandom'
-require 'three_scale_api/resources/provider'
+require 'three_scale_api/resources/account'
 require 'three_scale_api/http_client'
 require_relative '../spec_helper'
 
-RSpec.describe 'Provider Resource', type: :integration do
+RSpec.describe 'Account user Resource', type: :integration do
 
   before(:all) do
     @endpoint = ENV.fetch('ENDPOINT')
     @provider_key = ENV.fetch('PROVIDER_KEY')
+    @acc_name = SecureRandom.uuid
     @name = SecureRandom.uuid
+    @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @manager = ThreeScaleApi::Resources::ProviderManager.new(@http_client)
+    @acc_plan_mgr = ThreeScaleApi::Resources::AccountPlanManager.new(@http_client)
+    @acc_plan_def = @acc_plan_mgr['Default']
+
+    unless @acc_plan_def
+      plan = @acc_plan_mgr.create(name: 'Default')
+      plan.set_default
+    end
+
+    @acc_manager = ThreeScaleApi::Resources::AccountManager.new(@http_client)
+    @acc_resource = @acc_manager.sign_up(org_name: @acc_name, username: @acc_name)
+    @manager = @acc_resource.users
     @resource = @manager.create(username: @name,
-                                email: "#{@name}@example.com",
-                                password: @name)
+                                password: @name,
+                                email: "#{@name}@example.com")
   end
 
   after(:all) do
     begin
       @resource.delete
+      @acc_resource.delete
     rescue ThreeScaleApi::HttpClient::NotFoundError => ex
       puts ex
     end
   end
 
-  context '#provider CRUD' do
+  context '#account_user CRUD' do
     subject(:entity) { @resource.entity }
     let(:base_attr) { 'username' }
     it 'create' do

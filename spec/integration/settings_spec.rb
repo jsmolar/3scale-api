@@ -15,7 +15,6 @@ RSpec.describe 'Settings Resource', type: :integration do
   context '#settings read and update' do
     subject(:entity) { @manager.read }
 
-
     it 'read' do
       expect(entity).to be_truthy
       expect(entity.entity).to include('signups_enabled')

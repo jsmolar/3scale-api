@@ -23,6 +23,50 @@ module ThreeScaleApi
       def base_path
         super + "/accounts/#{@account['id']}/users"
       end
+
+      # Change state
+      #
+      # @param [Fixnum] id Account user id
+      # @param [String] state State ('member' | 'admin' | 'suspend' | 'unsuspend' | 'activate')
+      def set_state(id, state = 'member')
+        response = http_client.put("#{base_path}/#{id}/#{state}")
+        resource_instance(response)
+      end
+
+      # Suspends the Account user
+      #
+      # @param [Fixnum] id Account user ID
+      def suspend(id)
+        set_state(id, state: 'suspend')
+      end
+
+      # Resumes the Account user
+      #
+      # @param [Fixnum] id Account user ID
+      def resume(id)
+        set_state(id, state: 'unsuspend')
+      end
+
+      # Resumes the Account user
+      #
+      # @param [Fixnum] id Account user ID
+      def activate(id)
+        set_state(id, state: 'activate')
+      end
+
+      # Sets role as admin
+      #
+      # @param [Fixnum] id Account user ID
+      def set_as_admin(id)
+        set_state(id, state: 'admin')
+      end
+
+      # Sets role as member
+      #
+      # @param [Fixnum] id Account user ID
+      def set_as_member(id)
+        set_state(id, state: 'admin')
+      end
     end
 
     # Account user resource wrapper for account user received by REST API
@@ -36,6 +80,38 @@ module ThreeScaleApi
       def initialize(client, manager, entity)
         super(client, manager, entity)
         @account = manager.account
+      end
+
+      # Activate the account user
+      def activate
+        set_state('activate')
+      end
+
+      # Suspend the account user
+      def suspend
+        set_state('suspend')
+      end
+
+      # Resume the account user
+      def resume
+        set_state('unsuspend')
+      end
+
+      # Set the account user as admin
+      def as_admin
+        set_state('admin')
+      end
+
+      # Set the the account user as member
+      def as_member
+        set_state('member')
+      end
+
+      # Activate the account user
+      #
+      # @param [String] state State ('member' | 'admin' | 'suspend' | 'unsuspend' | 'activate')
+      def set_state(state)
+        @manager.set_state(@entity['id'], state) if @manager.respond_to?(:set_state)
       end
     end
   end

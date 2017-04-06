@@ -11,11 +11,11 @@ RSpec.describe 'Proxy API', type: :integration do
     @endpoint = ENV.fetch('ENDPOINT')
     @provider_key = ENV.fetch('PROVIDER_KEY')
     @name = SecureRandom.uuid
-    @rnd_num = SecureRandom.random_number(1_000_000_000) * 1.0
     @http_client = ThreeScaleApi::HttpClient.new(endpoint: @endpoint, provider_key: @provider_key)
-    @manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
-    @service = @manager.create(name: @name, system_name: @name)
-    @proxy = @service.proxy.read
+    @s_manager = ThreeScaleApi::Resources::ServiceManager.new(@http_client)
+    @service = @s_manager.create(name: @name, system_name: @name)
+    @manager = @service.proxy
+    @proxy = @manager.read
     @entity = @proxy.entity
     @url = "http://#{@name}.com:7777"
   end
@@ -29,6 +29,11 @@ RSpec.describe 'Proxy API', type: :integration do
   end
 
   context '#proxy CRUD' do
+
+    it 'has valid references' do
+      expect(@proxy.service).to eq(@service)
+      expect(@proxy.manager).to eq(@manager)
+    end
 
     it 'read' do
       expect(@entity).to include('service_id' => @service['id'])
