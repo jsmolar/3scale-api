@@ -20,7 +20,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super + ("/services/#{@service['id']}/proxy")
+        super.concat "/services/#{@service['id']}/proxy"
       end
 
       # Reads proxy

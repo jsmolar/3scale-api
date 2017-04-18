@@ -20,7 +20,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super + ('/webhooks')
+        super.concat '/webhooks'
       end
 
       # @api public

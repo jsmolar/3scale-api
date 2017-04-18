@@ -31,7 +31,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super + "/services/#{@service['id']}/proxy/mapping_rules"
+        super.concat "/services/#{@service['id']}/proxy/mapping_rules"
       end
 
       # Creates new mapping rule

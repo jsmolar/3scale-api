@@ -20,7 +20,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super + '/accounts'
+        super.concat '/accounts'
       end
 
       # Creates developer account (Same way as used in Developer portal)

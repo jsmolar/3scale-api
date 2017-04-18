@@ -19,7 +19,7 @@ module ThreeScaleApi
       #
       # @return [String] Base URL for the REST call
       def base_path
-        super + '/users'
+        super.concat '/users'
       end
 
       # Change state

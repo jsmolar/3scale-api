@@ -290,7 +290,6 @@ module ThreeScaleApi
       def to_h
         @entity
       end
-
     end
   end
 end

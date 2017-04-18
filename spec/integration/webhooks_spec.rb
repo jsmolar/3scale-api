@@ -13,14 +13,14 @@ RSpec.describe 'WebHooks Resource', type: :integration do
   context '#WebHooks read and update' do
     subject(:entity) { @manager.read }
 
-    it 'read' do
+    it 'should read webhooks' do
       expect(entity).to be_truthy
       expect(entity.entity).to include('account_created_on')
       expect(entity.entity).to include('url')
       expect(entity.entity).to include('active')
     end
 
-    it 'update' do
+    it 'should update webhooks url' do
       url = 'https://httpbin.org'
       orig_url = entity['url']
       entity['url'] = url
