@@ -12,3 +12,6 @@ Style/AccessorMethodName:
 
 Style/BracesAroundHashParameters:
   EnforcedStyle: context_dependent
+
+Metrics/MethodLength:
+  Max: 20

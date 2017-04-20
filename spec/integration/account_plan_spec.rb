@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../shared_stuff'
+require_relative '../shared_tests_config'
 
 RSpec.describe 'Account plan Resource', type: :integration do
 

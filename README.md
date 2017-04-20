@@ -1,4 +1,4 @@
-This gem aims to expose all [3scale](http://3scale.net) APIs with a Ruby interface.
+This gem aims to expose most of the [3scale](http://3scale.net) APIs with a Ruby interface.
 
 
 ## Installation
@@ -6,7 +6,7 @@ This gem aims to expose all [3scale](http://3scale.net) APIs with a Ruby interfa
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'ThreeScaleRest'
+gem 'ThreeScaleRest', git: 'https://github.com/pestanko/3scale-api'
 ```
 
 And then execute:
@@ -18,7 +18,6 @@ Or install it yourself as:
     $ gem install ThreeScaleRest
 
 ## Usage
-
 
 ```ruby
 require 'three_scale_api'
@@ -38,21 +37,18 @@ Design decisions:
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To run tests run `rake` or `rspec`.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. 
+To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Testing
 You need to have set these ENV variables:
 ```bash
 ENDPOINT=               # Url to admin pages
 PROVIDER_KEY=           # Provider key
-LOG_LEVEL=              # Logging Level
-```
+THREESCALE_LOG=         # Logging level (debug, warn, error, info)
 
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/pestanko/3scale-api.
+Bug reports and pull requests are welcome on [GitHub](https://github.com/pestanko/3scale-api).
